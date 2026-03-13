@@ -1,92 +1,94 @@
-AI-agents: Agentic 理財建議系統 🚀
-基於 LangGraph 與 TAIDE 12B 的多代理人協作系統，為使用者提供客製化、具在地化溫度的投資理財建議。
+這是一份為你的專案量身打造的 `README.md`。這份文件整合了你提供的 **A2A (Agent-to-Agent)**、**MCP (Model Context Protocol)** 協議、以及 **TAIDE 在地化模型**等核心技術亮點，並採用專業的 GitHub 專案格式撰寫。
 
-🌟 核心特色
-多代理人協作 (Multi-Agent Architecture)：利用 LangGraph 構建專家級節點（Goal Manager, Savings Advisor, Notifier），模擬人類理財顧問。
+---
 
-TAIDE 12B 整合：採用台灣在地化大語言模型 TAIDE，能精準理解並使用繁體中文金融術語，提供具台灣生活感的省錢建議。
+# 🚀 基於 A2A 與 MCP 協議之多代理人個人化理財管理系統
 
-RAG 知識增強：整合外部金融資訊與用戶歷史數據，有效抑制 LLM 的幻覺現象。
+本平台是一個整合多個 AI Agents 的個人化財務管理系統，結合**記帳、預算控管、短期儲蓄規劃與投資建議**。特別針對學生族群設計，旨在降低理財門檻、提升財務自律，並透過台灣在地化大模型 **TAIDE** 確保理財建議符合台灣金融環境與文化語境。
 
-高效能數據持久化：
+## 📌 專案核心動機
 
-PostgreSQL: 存儲核心財務目標與交易一致性數據。
+1. **解決學生痛點**：針對資金有限、缺乏投資知識、消費自制力不足及財務規劃能力缺失等問題。
+2. **標準化協作 (A2A & MCP)**：引入 A2A 與 MCP 協議，解決 LLM 上下文標準化缺失及異質代理人間的通訊障礙。
+3. **數位主權與在地化**：使用 **TAIDE** 模型，精準理解台灣特有金融術語（如：台股 ETF、高股息標的）。
 
-Redis: 實作 Checkpointer 機制，保存多輪對話狀態。
+---
 
-MongoDB: 存放非結構化 RAG 知識文件與詳細 Log。
+## 🏗️ 系統架構 (System Architecture)
 
-🏗️ 系統架構圖
-本專案採用非線性圖結構，確保每個 Agent 都能在正確的時機點介入處理。
+本系統採用 **LangGraph** 框架實現多代理人協作，將複雜的財務處理拆解為專責節點：
 
-程式碼片段
-graph TD
-    User((使用者)) --> Manager[Goal Manager Node]
-    Manager --> Router{進度路由判斷}
-    Router -- 進度落後/分析請求 --> Advisor[Savings Advisor Node]
-    Router -- 資料同步 --> Notifier[Progress Notifier Node]
-    Advisor -- AI 生成建議 --> Notifier
-    Notifier --> User
-    
-    subgraph "數據層"
-    Manager <--> PG[(PostgreSQL)]
-    Advisor <--> TAIDE[[TAIDE 12B GPU]]
-    Notifier <--> Redis[(Redis Cache)]
-    end
-🛠️ 技術棧 (Tech Stack)
-Framework: LangGraph, LangChain
+### 1. 記帳領域 (Bookkeeping Domain)
 
-LLM: TAIDE 12B (Llama-based)
+負責日常收支的結構化處理。
 
-Language: Python 3.10+
+* **Bookkeeping Coordinator**: 主協調器，負責意圖分派。
+* **Transaction Parser**: 將自然語言轉為結構化 JSON（如：「今天吃麥噹噹 150」）。
+* **Anomaly Detector**: 偵測異常消費（例如：超過歷史平均 2 個標準差）。
+* **Budget Monitor**: 監控預算水位（50%/75%/90%/100% 分級警告）。
 
-Database: PostgreSQL, Redis, MongoDB
+### 2. 目標領域 (Goal Domain)
 
-Infrastructure: Docker, AI-Stack (GPU Support)
+協助建立與追蹤儲蓄目標。
 
-📂 專案結構
-Plaintext
-.
-├── src/
-│   ├── agents/
-│   │   └── goals/
-│   │       ├── coordinator.py      # LangGraph 工作流定義 (中控)
-│   │       ├── goal_manager.py     # 負責目標數據運算
-│   │       ├── savings_advisor.py  # TAIDE 模型推理節點
-│   │       └── progress_notifier.py # 最終結果彙整節點
-│   ├── database/
-│   │   └── crud.py                # 資料庫操作邏輯
-│   └── state.py                    # 定義 TypedDict 狀態
-├── tests/
-│   └── test_goals.py               # 完整端到端測試腳本
-└── .env                            # 環境變數設定
-🚀 快速開始
-1. 安裝依賴
-Bash
-pip install -r requirements.txt
-2. 環境配置
-建立 .env 檔案並填入資料庫連線資訊：
+* **Goal Manager**: 計算達成率、資金缺口及理想進度（expected_rate）。
+* **Savings Advisor**: 當進度落後（is_lagging）時，生成具體開源節流建議。
+* **Progress Notifier**: 將數據轉化為溫暖、具台灣語感的鼓勵訊息。
 
-程式碼片段
-DB_USER=your_user
-DB_PASSWORD=your_password
-DB_HOST=127.0.0.1
-DB_NAME=your_db
-3. 執行 Agent 測試
-Bash
-export PYTHONPATH=.
-python3 tests/test_goals.py
-📈 Demo 測試結果範例
-當使用者設定了「日本京都旅遊」目標，系統會自動產出：
+### 3. 金額知識領域 (Finance Knowledge Domain)
 
-【日本京都旅遊 進度報告】
-萬事起頭難，我們一起努力！💪
-📊 目前達成率：10.0%
-📉 剩餘缺口：$45,000
+基於 **RAG (Retrieval-Augmented Generation)** 的諮詢專家。
 
-💡 理財教練小叮嚀：
+* **Knowledge Retriever**: 從 PostgreSQL + pgvector 檢索台股與 ETF 知識。
+* **News Adapter**: 透過 A2A 協議橋接新聞子圖，獲取即時市場動態。
 
-減少外食頻率：京都美食多但餐廳貴，平時可多自煮或選擇平價店家。
+---
 
-善用交通卡：考慮購買京都市巴士一日券，並步行欣賞風景，省下計程車費。
+## 🛠️ 技術棧 (Tech Stack)
 
+* **核心模型**: TAIDE 12B (Llama-3 based, 台灣在地化模型)
+* **開發框架**: LangGraph, LangChain
+* **協議規範**: A2A (Agent-to-Agent), MCP (Model Context Protocol)
+* **資料庫**:
+* **PostgreSQL (pgvector)**: 儲存交易紀錄、目標及向量化知識庫。
+* **Redis**: 實作 Checkpointer 對話狀態保存與即時預算快取。
+* **MongoDB**: 存放非結構化日誌與用戶行為軌跡。
+
+
+* **基礎設施**: 雲端 AI-Stack (GPU 資源部署)
+
+---
+
+## 📅 專案進度 (Roadmap)
+
+| 階段 | 時間 | 任務描述 | 狀態 |
+| --- | --- | --- | --- |
+| **部署與開發** | 3月 - 6月中 | 部署雲端 AI Stack，完成各 Agent 核心代碼 | 🏃 Processing |
+| **系統整合** | 6月中 - 8月中 | 多代理系統整合 (A2A)、UI 介面開發 | 📅 Todo |
+| **上線測試** | 9月 | 招募 30 名學生進行試用並蒐集回饋 | 📅 Todo |
+| **競賽與發表** | 10月 - 12月 | 參加全國資服競賽，進行專案成果發表 | 📅 Todo |
+
+---
+
+## 📊 預期成果
+
+1. **驗證 A2A/MCP 範式**：建立一套可供台灣在地 AI 應用參考的開發模式。
+2. **在地化知識庫**：建構結構化的台股、ETF 投資百科。
+3. **行為改善**：預期提升使用者 40% 以上的記帳持續率與預算達成度。
+
+---
+
+
+```
+
+---
+
+
+
+---
+
+### 💡 專案亮點筆記 (For Interviewer/Recruiter)
+
+* **技術深度**：使用了最新的 MCP 協議解決 Tool 使用的標準化問題，並透過 LangGraph 的 `Conditional Edges` 實現複雜的路由判斷。
+* **在地化優勢**：不同於一般 GPT 應用，本專案深度整合 TAIDE，解決台灣特有金融場景（如：0050, 00878 等 ETF）的理解痛點。
+* **數據科學應用**：在異常偵測節點中結合了統計學規則（平均值 ± 標準差）與 LLM 語意判斷。
