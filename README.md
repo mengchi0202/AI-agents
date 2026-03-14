@@ -1,6 +1,3 @@
-這是一份為你的專案量身打造的 `README.md`。這份文件整合了你提供的 **A2A (Agent-to-Agent)**、**MCP (Model Context Protocol)** 協議、以及 **TAIDE 在地化模型**等核心技術亮點，並採用專業的 GitHub 專案格式撰寫。
-
----
 
 # 🚀 基於 A2A 與 MCP 協議之多代理人個人化理財管理系統
 
@@ -14,11 +11,11 @@
 
 ---
 
-## 🏗️ 系統架構 (System Architecture)
+## 🏗️ 系統架構 
 
 本系統採用 **LangGraph** 框架實現多代理人協作，將複雜的財務處理拆解為專責節點：
 
-### 1. 記帳領域 (Bookkeeping Domain)
+### 1. 記帳領域 
 
 負責日常收支的結構化處理。
 
@@ -27,7 +24,7 @@
 * **Anomaly Detector**: 偵測異常消費（例如：超過歷史平均 2 個標準差）。
 * **Budget Monitor**: 監控預算水位（50%/75%/90%/100% 分級警告）。
 
-### 2. 目標領域 (Goal Domain)
+### 2. 目標領域 
 
 協助建立與追蹤儲蓄目標。
 
@@ -35,22 +32,22 @@
 * **Savings Advisor**: 當進度落後（is_lagging）時，生成具體開源節流建議。
 * **Progress Notifier**: 將數據轉化為溫暖、具台灣語感的鼓勵訊息。
 
-### 3. 金額知識領域 (Finance Knowledge Domain)
+### 3. 金額知識領域 
 
-基於 **RAG (Retrieval-Augmented Generation)** 的諮詢專家。
+基於 **RAG ** 的諮詢專家。
 
 * **Knowledge Retriever**: 從 PostgreSQL + pgvector 檢索台股與 ETF 知識。
 * **News Adapter**: 透過 A2A 協議橋接新聞子圖，獲取即時市場動態。
 
 ---
 
-## 🛠️ 技術棧 (Tech Stack)
+## 🛠️ 技術棧 
 
 * **核心模型**: TAIDE 12B (Llama-3 based, 台灣在地化模型)
 * **開發框架**: LangGraph, LangChain
 * **協議規範**: A2A (Agent-to-Agent), MCP (Model Context Protocol)
 * **資料庫**:
-* **PostgreSQL (pgvector)**: 儲存交易紀錄、目標及向量化知識庫。
+* **PostgreSQL **: 儲存交易紀錄、目標及向量化知識庫。
 * **Redis**: 實作 Checkpointer 對話狀態保存與即時預算快取。
 * **MongoDB**: 存放非結構化日誌與用戶行為軌跡。
 
@@ -77,14 +74,6 @@
 3. **行為改善**：預期提升使用者 40% 以上的記帳持續率與預算達成度。
 
 ---
-
-
-```
-
----
-
-
-
 ---
 
 ### 💡 專案亮點筆記 (For Interviewer/Recruiter)
