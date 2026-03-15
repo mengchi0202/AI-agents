@@ -22,7 +22,7 @@
 * **Bookkeeping Coordinator**: 主協調器，負責意圖分派。
 * **Transaction Parser**: 將自然語言轉為結構化 JSON（如：「今天吃麥噹噹 150」）。
 * **Anomaly Detector**: 偵測異常消費（例如：超過歷史平均 2 個標準差）。
-* **Budget Monitor**: 監控預算水位（50%/75%/90%/100% 分級警告）。
+* **Budget Monitor**: 監控預算進度（50%/75%/90%/100% 分級警告）。
 
 ### 2. 目標領域 
 
