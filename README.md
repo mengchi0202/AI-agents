@@ -42,16 +42,55 @@
 ### 4. 投資建議領域 
 ---
 
-## 🛠️ 技術棧 
+### 核心技術
+| 技術 | 用途 | 說明 |
+|------|------|------|
+| **TAIDE-LX-7B** | LLM | 繁體中文語言模型，用於所有語意理解任務 |
+| **LangGraph** | Agent 框架 | 將 Agent 設計為 Node，透過 State 流轉資料 |
+| **A2A Protocol** | Agent 間通訊 | 跨 Domain Agent 協作（如記帳→目標追蹤） |
+| **MCP** | 工具協議 | Agent 呼叫外部工具（DB 查詢、寫入等） |
+| **FastAPI** | 後端 | API 服務 |
+| **PostgreSQL** | 主資料庫 | 使用者、交易、預算、目標 |
+| **MongoDB** | 彈性儲存 | 對話狀態、日誌、事件、新聞 |
+| **Redis** | 快取 | Session、預算快取、限流 |
 
-* **核心模型**: TAIDE 12B (Llama-3 based, 台灣在地化模型)
-* **開發框架**: LangGraph, LangChain
-* **協議規範**: A2A (Agent-to-Agent), MCP (Model Context Protocol)
-* **資料庫**:
-* **PostgreSQL **: 儲存交易紀錄、目標及向量化知識庫。
-* **Redis**: 實作 Checkpointer 對話狀態保存與即時預算快取。
-* **MongoDB**: 存放非結構化日誌與用戶行為軌跡。
+### 設計原則
+- 所有 Node 皆使用 **TAIDE LLM** 進行語意理解，不使用 rule-based
+- 各 Node 透過 **BookkeepingState** 共享狀態流轉
+- 跨 Domain 通訊採用 **A2A Protocol**，各 Domain 獨立開發
+- DB 尚未連上的 Node 使用 **Mock 數據**，之後替換
 
+## 💾 資料庫架構
+### PostgreSQL（結構化數據）
+
+儲存核心業務資料，使用純 SQL + psycopg2 操作。
+
+| 資料表 | 用途 |
+|--------|------|
+| users | 使用者資料（LINE ID、姓名、生日、性別） |
+| categories | 消費分類（17 個預設分類含子分類） |
+| transactions | 交易記錄（收入/支出） |
+| budgets | 預算管理 |
+| financial_goals | 財務目標追蹤 |
+
+### MongoDB（彈性數據）
+
+| Collection | 用途 |
+|------------|------|
+| conversation_states | Agent 對話狀態 |
+| llm_logs | LLM 解析日誌 |
+| events | 事件總線（Agent 間通訊記錄） |
+| financial_news | 財經新聞 |
+| user_behaviors | 使用者行為記錄 |
+
+### Redis（快取與即時數據）
+
+| 功能 | Key 格式 | 過期時間 |
+|------|----------|----------|
+| 使用者 Session | `session:{user_id}` | 30 分鐘 |
+| 預算快取 | `budget:{user_id}` | 1 小時 |
+| 分類快取 | `categories:all` | 24 小時 |
+| 當日消費總額 | `daily_total:{user_id}:{date}` | 2 小時 |
 
 * **基礎設施**: 雲端 AI-Stack (GPU 資源部署)
 
